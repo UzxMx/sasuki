@@ -33,7 +33,7 @@ class DevicesController < ApplicationController
           last_file.close
         end
         path = File.join(dir, filename)
-        file = File.open(path, "a+")
+        file = File.open(path, "ab")
       else
         file = last_file
       end

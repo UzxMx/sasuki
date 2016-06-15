@@ -18,7 +18,7 @@ module ApplicationCable
       device_id = env["HTTP_X_DEVICE_ID"]
 
       application = Application.where({ app_id: app_id }).first
-      device = Device.where({ application: application }).first
+      device = Device.where({ application: application, device_id: device_id }).first
       if device.nil?
         device = Device.new({
           device_id: device_id
@@ -53,7 +53,7 @@ module ApplicationCable
     def disconnect
       logger.debug "disconnect"
 
-      puts "current_device:#{current_device}"
+      logger.debug "current_device:#{current_device}"
 
       current_device.online = false
       current_device.save!
