@@ -44,7 +44,7 @@ module ApplicationCable
       message_callback = -> message do
         message_from_captain(message)
       end
-      psub_callback = Psub.server.subscribe("from_captain:devices:#{device.id}", message_callback)
+      self.psub_callback = Psub.server.subscribe("from_captain:devices:#{device.id}", message_callback)
 
       # inform device appearance
       Psub.server.broadcast("from_devices:devices", type: "appearance", device_id: current_device.id)
@@ -59,7 +59,7 @@ module ApplicationCable
       current_device.save!
 
       # unregister sub
-      Psub.server.unsubscribe("from_captain:devices#{current_device.id}", psub_callback)
+      Psub.server.unsubscribe("from_captain:devices:#{current_device.id}", psub_callback)
 
       #inform device disappearance
       Psub.server.broadcast("from_devices:devices", type: "disappearance", device_id: current_device.id)
