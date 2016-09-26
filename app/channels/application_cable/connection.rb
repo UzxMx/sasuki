@@ -27,6 +27,8 @@ module ApplicationCable
       device.application = application
       device.online = true
 
+      device.status_records = status_changed(device, true)
+
       if device.auth_token.empty?
         device.auth_token = SecureRandom.uuid
       end
@@ -56,6 +58,7 @@ module ApplicationCable
       logger.debug "current_device:#{current_device}"
 
       current_device.online = false
+      current_device.status_records = status_changed(current_device, false)
       current_device.save!
 
       # unregister sub
@@ -70,6 +73,35 @@ module ApplicationCable
         logger.debug "message:#{message}"
 
         handle_commands(message)
+      end
+
+      def status_changed(device, online)
+        status_records_in_json = nil
+
+        status_changed_time = Time.now
+        today_status_records_key = status_changed_time.strftime('%Y-%m-%d')
+        today_status_records_in_json = nil
+        status_records_str = device.status_records
+
+        if !status_records_str.nil? and !status_records_str.empty?
+          status_records_in_json = JSON.parse(status_records_str)
+        end
+
+        if status_records_in_json.nil?
+          status_records_in_json = {}
+        else
+          today_status_records_in_json = status_records_in_json[today_status_records_key]
+        end
+
+        if today_status_records_in_json.nil?
+          today_status_records_in_json = {}
+          status_records_in_json[today_status_records_key] = today_status_records_in_json
+        end
+
+        status_record_key = status_changed_time.strftime('%H:%M:%S')
+        today_status_records_in_json[status_record_key] = online ? 1 : 0
+
+        JSON.generate(status_records_in_json)
       end
   end
 end
