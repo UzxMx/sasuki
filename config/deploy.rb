@@ -22,7 +22,7 @@ set :deploy_to, '/home/webuser/deploy/sasuki'
 
 # Default value for :linked_files is []
 # append :linked_files, "config/database.yml"
-append :linked_files, 'config/database.yml'
+append :linked_files, 'config/database.yml', 'config/local_env.yml'
 
 # Default value for linked_dirs is []
 append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system'
@@ -40,3 +40,5 @@ append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/syst
 # set :ssh_options, verify_host_key: :secure
 
 set :rvm_ruby_version, File.read('.ruby-version').strip
+
+set :nginx_template, File.expand_path("../nginx/#{fetch(:stage)}.conf.erb", __FILE__)
